@@ -94,11 +94,8 @@ class Boiler:
             self.config['mode_command_topic'] = mode_command_topic.format(
                 id=self.id)
             if await self.tydom_client.get_thermostat_custom_presets() is None:
-                if await self.tydom_client.get_manual_presets() is None:
                 self.config['preset_modes'] = [
-                        "STOP", "ANTI_FROST", "ECO", "COMFORT", "AUTO"]
-            else:
-                self.config['preset_modes'] = [k for k in await self.tydom_client.get_thermostat_custom_presets()]
+                    "STOP", "ANTI_FROST", "ECO", "COMFORT", "AUTO"]
             else:
                 self.config['preset_modes'] = [k for k in await self.tydom_client.get_thermostat_custom_presets()]
             self.config['preset_mode_state_topic'] = preset_mode_state_topic.format(

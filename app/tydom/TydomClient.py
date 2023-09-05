@@ -45,12 +45,6 @@ class TydomClient:
             self.thermostat_custom_presets = json.loads(thermostat_custom_presets)
             self.current_preset = {}
 
-        if thermostat_custom_presets is None:
-            self.thermostat_custom_presets = None
-        else:
-            self.thermostat_custom_presets = json.loads(thermostat_custom_presets)
-            self.current_preset = {}
-
         # Set Host, ssl context and prefix for remote or local connection
         if self.host == MEDIATION_URL:
             logger.info("Configure remote mode (%s)", self.host)
