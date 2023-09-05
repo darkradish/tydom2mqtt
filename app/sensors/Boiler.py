@@ -111,7 +111,6 @@ class Boiler:
 
     async def update(self):
         await self.setup()
-
         if self.mqtt is not None:
             if 'temperature' in self.attributes:
                 self.mqtt.mqtt_client.publish(
@@ -139,6 +138,14 @@ class Boiler:
                             self.config['preset_mode_state_topic'],
                             set_preset,
                             qos=0, retain=True)
+            if 'authorization' in self.attributes:
+                print(self.attributes['authorization'])
+                self.mqtt.mqtt_client.publish(
+                    self.config['mode_state_topic'],
+                    "heat" if self.attributes['authorization'] == "HEATING" else
+                    "cool" if self.attributes['authorization'] == "COOLING" else
+                    "off",
+                    qos=0, retain=True)
             if 'thermicLevel' in self.attributes:
                 self.mqtt.mqtt_client.publish(
                     self.config['mode_state_topic'],
@@ -170,8 +177,14 @@ class Boiler:
     async def put_hvac_mode(tydom_client, device_id, boiler_id, set_hvac_mode):
         logger.info("%s %s %s", boiler_id, 'set_hvacMode', set_hvac_mode)
         if set_hvac_mode == 'off':
-            await tydom_client.put_devices_data(device_id, boiler_id, 'thermicLevel', 'STOP')
+            logger.info("Power off")
+            await tydom_client.put_devices_data(device_id, boiler_id, 'authorization', 'STOP')
+        elif set_hvac_mode == 'heat':
+            await tydom_client.put_devices_data(device_id, boiler_id, 'authorization', 'HEATING')
+        elif set_hvac_mode == 'cool':
+            await tydom_client.put_devices_data(device_id, boiler_id, 'authorization', 'COOLING')
         else:
+            await tydom_client.put_devices_data(device_id, boiler_id, 'authorization', 'HEATING')
             await tydom_client.put_devices_data(device_id, boiler_id, 'thermicLevel', 'COMFORT')
             await tydom_client.put_devices_data(device_id, boiler_id, 'setpoint', '19')
 
@@ -181,6 +194,8 @@ class Boiler:
             logger.info("Set thermic level (device=%s, level=%s)",
                         device_id, set_thermic_level)
             await tydom_client.put_devices_data(device_id, boiler_id, 'thermicLevel', set_thermic_level)
+            if set_thermic_level == 'STOP':
+                await tydom_client.put_devices_data(device_id, boiler_id, 'authorization', 'STOP')
             if await tydom_client.get_thermostat_custom_presets() is not None:
                 await tydom_client.set_thermostat_custom_current_preset(device_id, set_thermic_level)
                 presets = await tydom_client.get_thermostat_custom_presets()
