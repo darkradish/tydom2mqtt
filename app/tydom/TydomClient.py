@@ -41,10 +41,7 @@ class TydomClient:
         # Some devices (like Tywatt) need polling
         self.poll_device_urls = []
         self.current_poll_index = 0
-
-        if thermostat_custom_presets is None:
-            self.thermostat_custom_presets = None
-        else:
+        if thermostat_custom_presets is not None:
             self.thermostat_custom_presets = json.loads(thermostat_custom_presets)
             self.current_preset = {}
 
