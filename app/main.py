@@ -60,6 +60,7 @@ async def listen_tydom():
                 except Exception as e:
                     logger.warning("Unable to handle message: %s", e)
                     await tydom_client.disconnect()
+                    break
 
         except socket.gaierror as e:
             logger.error("Socket error (%s)", e)
