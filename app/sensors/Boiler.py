@@ -140,7 +140,6 @@ class Boiler:
                             set_preset,
                             qos=0, retain=True)
             if 'authorization' in self.attributes:
-                print(self.attributes['authorization'])
                 self.mqtt.mqtt_client.publish(
                     self.config['mode_state_topic'],
                     "heat" if self.attributes['authorization'] == "HEATING" else
